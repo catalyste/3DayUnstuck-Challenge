@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 3-Day Unstuck Challenge</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #1a1612;
+    --cream: #f5f0e8;
+    --warm: #e8ddd0;
+    --rust: #b85c38;
+    --gold: #c8963e;
+    --sage: #7a8c6e;
+    --muted: #8a7d6e;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  header {
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: linear-gradient(to bottom, #ede6d6, var(--cream));
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 0.75rem;
+    font-weight: 500;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 420px;
+    margin: 0.75rem auto 0;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .day-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 1.5rem 1rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    background: var(--cream);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .day-tab {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -1px;
+  }
+
+  .day-tab.active {
+    color: var(--rust);
+    border-bottom-color: var(--rust);
+  }
+
+  .day-tab:hover:not(.active) {
+    color: var(--ink);
+  }
+
+  .content {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  .day-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--warm);
+  }
+
+  .day-number {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+  }
+
+  .day-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .day-intention {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* Exercises */
+  .exercise {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s;
+  }
+
+  .exercise:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+  .exercise-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .exercise-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .icon-rust { background: #fdf0eb; }
+  .icon-gold { background: #fdf6eb; }
+  .icon-sage { background: #edf3eb; }
+
+  .exercise-meta { flex: 1; }
+
+  .exercise-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+    font-weight: 500;
+  }
+
+  .exercise-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+
+  .exercise-desc {
+    font-size: 0.88rem;
+    color: #5a5048;
+    line-height: 1.65;
+    margin-bottom: 1rem;
+  }
+
+  .prompt-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .prompt-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.87rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .prompt-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rust);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .prompt-bullet.gold { background: var(--gold); }
+  .prompt-bullet.sage { background: var(--sage); }
+
+  /* Textarea inputs */
+  .write-area {
+    width: 100%;
+    min-height: 100px;
+    border: 1px solid var(--warm);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+    background: var(--cream);
+    resize: vertical;
+    outline: none;
+    margin-top: 0.75rem;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .write-area::placeholder { color: #b5a898; }
+  .write-area:focus { border-color: var(--rust); }
+
+  .write-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-top: 0.75rem;
+    display: block;
+  }
+
+  /* Slider */
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 2.5rem;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .slider-name {
+    font-size: 0.82rem;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--warm);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--rust);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  .slider-val {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--rust);
+    text-align: right;
+  }
+
+  /* Checklist */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .check-item:hover { background: #faf7f2; }
+
+  .check-item.checked {
+    background: #fdf0eb;
+    border-color: rgba(184, 92, 56, 0.15);
+  }
+
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid #c5b8a8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--rust);
+    border-color: var(--rust);
+  }
+
+  .check-mark {
+    color: white;
+    font-size: 0.7rem;
+    display: none;
+  }
+
+  .check-item.checked .check-mark { display: block; }
+
+  .check-text {
+    font-size: 0.87rem;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  /* Insight card */
+  .insight-card {
+    background: linear-gradient(135deg, #3d2f22, #5c3d28);
+    color: var(--cream);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .insight-card .eyebrow { color: var(--gold); margin-bottom: 0.5rem; }
+
+  .insight-card p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    opacity: 0.9;
+  }
+
+  /* Navigation */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--warm);
+  }
+
+  .nav-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--warm);
+  }
+
+  .btn-secondary:hover { color: var(--ink); border-color: #c5b8a8; }
+
+  .btn-primary {
+    background: var(--rust);
+    color: white;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-primary:hover { background: #a04e2e; transform: translateY(-1px); }
+
+  .progress-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--warm);
+    transition: background 0.3s;
+  }
+
+  .dot.active { background: var(--rust); }
+  .dot.done { background: var(--gold); }
+
+  /* Summary */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.1rem;
+    border: 1px solid rgba(0,0,0,0.06);
+    text-align: center;
+  }
+
+  .summary-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--rust);
+    display: block;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Animations */
+  .day-panel.active {
+    animation: fadeUp 0.35s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .slider-row { grid-template-columns: 110px 1fr 2rem; }
+    .summary-grid { grid-template-columns: 1fr; }
+    .day-tab { padding: 0.65rem 1rem; font-size: 0.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">A personal reset</div>
+  <h1>The 3-Day <em>Unstuck</em> Challenge</h1>
+  <p class="subtitle">Three days. Three angles. One honest look at where you are and where you want to go.</p>
+</header>
+
+<div class="day-tabs">
+  <button class="day-tab active" onclick="showDay(1)">Day 1 — Feel</button>
+  <button class="day-tab" onclick="showDay(2)">Day 2 — See</button>
+  <button class="day-tab" onclick="showDay(3)">Day 3 — Move</button>
+</div>
+
+<div class="content">
+
+  <!-- DAY 1 -->
+  <div class="day-panel active" id="day1">
+    <div class="day-header">
+      <div class="day-number">Day One</div>
+      <div class="day-title">Name What Hurts</div>
+      <div class="day-intention">You can't fix what you won't face. Today is about honest acknowledgment — no fixing, no planning. Just truth.</div>
+    </div>
+
+    <div class="insight-card">
+      <div class="eyebrow">Why this comes first</div>
+      <p>Feeling stuck isn't a character flaw — it's a signal. Something in you knows a gap exists between where you are and where you want to be. Today we listen to that signal instead of muffling it.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-rust">🌡️</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 1 · Life Audit</div>
+          <div class="exercise-title">The Honest Temperature Check</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Rate each area of your life right now. No overthinking — first gut reaction.</div>
+      <div class="slider-group">
+        <div class="slider-row">
+          <span class="slider-name">Work / Career</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Relationships</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Health & Energy</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Purpose & Meaning</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Fun & Joy</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Financial Security</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-name">Creative Outlet</span>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider(this)">
+          <span class="slider-val">5</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-rust">✍️</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 2 · Brain Dump</div>
+          <div class="exercise-title">The Unfiltered Vent</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Set a 10-minute timer. Write everything that's been eating at you. Don't edit. Don't be polite. Just let it out.</div>
+      <span class="write-label">What's actually been weighing on you?</span>
+      <textarea class="write-area" placeholder="No filter here. What's really going on? What feels heavy, broken, unfair, disappointing, scary, or lost? Write until time's up."></textarea>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-rust">🔍</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 3 · Root Cause</div>
+          <div class="exercise-title">The 5 Whys</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Pick the biggest thing bothering you. Ask "why?" five times to get beneath the surface complaint to the real issue.</div>
+      <span class="write-label">Why am I feeling stuck? (Why #1)</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="e.g. Because I hate my job..."></textarea>
+      <span class="write-label">But why is that? (Why #2)</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="e.g. Because I never chose it for myself..."></textarea>
+      <span class="write-label">And why does that matter? (Why #3)</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="Keep going deeper..."></textarea>
+      <span class="write-label">What does that tell me? (Why #4)</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="Getting closer to the real thing..."></textarea>
+      <span class="write-label">What's the core truth? (Why #5)</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="This is usually where something real lives."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <div></div>
+      <div class="progress-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="nav-btn btn-primary" onclick="showDay(2)">Day 2 →</button>
+    </div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-panel" id="day2">
+    <div class="day-header">
+      <div class="day-number">Day Two</div>
+      <div class="day-title">Find What's Missing</div>
+      <div class="day-intention">Now that you've named the pain, we go looking for the gap — the distance between who you are now and who you actually want to be.</div>
+    </div>
+
+    <div class="insight-card">
+      <div class="eyebrow">The reframe</div>
+      <p>Feeling stuck usually isn't about lacking willpower. It's about a misalignment — between your values and your daily life, between your potential and your environment, or between who you are and who others expect you to be.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-gold">⭐</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 1 · Values Scan</div>
+          <div class="exercise-title">What Actually Matters to You</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Check everything that genuinely matters to you — not what should matter, what actually does.</div>
+      <div class="checklist" id="values-list">
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Freedom & autonomy</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Deep, meaningful relationships</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Recognition & being seen</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Financial stability & security</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Adventure & new experiences</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Creative expression</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Health & physical vitality</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Making a difference / impact</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Stability & routine</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Growth & continuous learning</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Belonging & community</span></div>
+        <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="check-text">Peace of mind</span></div>
+      </div>
+      <span class="write-label">Which of these is most absent from your current life?</span>
+      <textarea class="write-area" style="min-height:70px" placeholder="Be specific. If 'freedom' — freedom from what? Freedom to do what?"></textarea>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-gold">🔮</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 2 · Future Self</div>
+          <div class="exercise-title">Letter From Your 80-Year-Old Self</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Imagine you're 80, looking back. Write a short letter to yourself today. What do they wish you'd done sooner? What were you worrying about that didn't matter?</div>
+      <span class="write-label">Dear [your name]...</span>
+      <textarea class="write-area" style="min-height:130px" placeholder="Write as your future self. What matters from that vantage point? What decision point are you at right now that matters most?"></textarea>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-gold">🪞</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 3 · Gap Analysis</div>
+          <div class="exercise-title">The Gap That's Keeping You Stuck</div>
+        </div>
+      </div>
+      <ul class="prompt-list">
+        <li class="prompt-item"><div class="prompt-bullet gold"></div>What version of yourself did you imagine you'd be by now?</li>
+        <li class="prompt-item"><div class="prompt-bullet gold"></div>What specific thing keeps not happening that you secretly hoped would?</li>
+        <li class="prompt-item"><div class="prompt-bullet gold"></div>If a close friend described the gap they see in your life, what would they say?</li>
+      </ul>
+      <textarea class="write-area" placeholder="Answer all three, or just the one that hits hardest."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn btn-secondary" onclick="showDay(1)">← Day 1</button>
+      <div class="progress-dots">
+        <div class="dot done"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="nav-btn btn-primary" onclick="showDay(3)">Day 3 →</button>
+    </div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-panel" id="day3">
+    <div class="day-header">
+      <div class="day-number">Day Three</div>
+      <div class="day-title">Choose One Move</div>
+      <div class="day-intention">Clarity without action is just daydreaming. Today you commit to one small, concrete thing that begins to close the gap.</div>
+    </div>
+
+    <div class="insight-card">
+      <div class="eyebrow">The secret about getting unstuck</div>
+      <p>You don't need a life overhaul. You need one honest decision and one small action. Momentum builds from movement, not from having it all figured out. A single honest step beats a perfect plan that never starts.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-sage">🧭</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 1 · Clarity Distillation</div>
+          <div class="exercise-title">What Have These Two Days Revealed?</div>
+        </div>
+      </div>
+      <ul class="prompt-list">
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>The area of my life that needs the most attention is...</li>
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>The thing I've been avoiding facing is...</li>
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>The value most missing from my daily life is...</li>
+      </ul>
+      <textarea class="write-area" placeholder="Try to answer each in one sentence. Brevity forces honesty."></textarea>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-sage">⚡</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 2 · Obstacle Map</div>
+          <div class="exercise-title">What's Actually in the Way</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Sort your obstacles honestly — is each one real, or a story you're telling yourself?</div>
+      <span class="write-label">Real external constraints (time, money, responsibilities, health):</span>
+      <textarea class="write-area" style="min-height:70px" placeholder="Be honest — not everything belongs here."></textarea>
+      <span class="write-label">Fear or self-doubt (the inner obstacles):</span>
+      <textarea class="write-area" style="min-height:70px" placeholder="What are you actually afraid of? Failure? Success? Being judged? Change?"></textarea>
+      <span class="write-label">Habits or patterns keeping you in place:</span>
+      <textarea class="write-area" style="min-height:70px" placeholder="What do you keep doing (or not doing) that maintains the status quo?"></textarea>
+    </div>
+
+    <div class="exercise">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-sage">🚀</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Exercise 3 · The One Move</div>
+          <div class="exercise-title">Your Commitment</div>
+        </div>
+      </div>
+      <div class="exercise-desc">Not ten things. Not a new chapter. Just one thing you can do in the next 72 hours that would be a real, honest step forward. It should be small enough to actually do and meaningful enough to matter.</div>
+      <span class="write-label">My one move is:</span>
+      <textarea class="write-area" style="min-height:70px" placeholder="Be specific. Not 'exercise more' — 'go for a 20-min walk tomorrow at 7am.' Not 'fix my career' — 'email one person this week who is doing work I admire.'"></textarea>
+      <span class="write-label">I'll know I've done it when:</span>
+      <textarea class="write-area" style="min-height:60px" placeholder="Define what done looks like."></textarea>
+      <span class="write-label">The biggest thing I learned about myself in these 3 days:</span>
+      <textarea class="write-area" style="min-height:80px" placeholder="Don't skip this. The insight is the point."></textarea>
+    </div>
+
+    <div class="exercise" style="background: linear-gradient(135deg, #f0ede6, white);">
+      <div class="exercise-header">
+        <div class="exercise-icon icon-sage">🌱</div>
+        <div class="exercise-meta">
+          <div class="exercise-label">Beyond Day 3</div>
+          <div class="exercise-title">Repeat As Needed</div>
+        </div>
+      </div>
+      <div class="exercise-desc">This isn't a one-time fix. Stuck feelings often return. When they do — come back. Name it, find the gap, choose one move. That cycle is the whole thing. You've already done it once.</div>
+      <ul class="prompt-list" style="margin-top: 0.5rem;">
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>Tell one honest person what you discovered this week</li>
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>Block 15 minutes in your calendar for "your one move"</li>
+        <li class="prompt-item"><div class="prompt-bullet sage"></div>Return here in 30 days and do it again</li>
+      </ul>
+    </div>
+
+    <div class="nav-row">
+      <button class="nav-btn btn-secondary" onclick="showDay(2)">← Day 2</button>
+      <div class="progress-dots">
+        <div class="dot done"></div>
+        <div class="dot done"></div>
+        <div class="dot active"></div>
+      </div>
+      <div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showDay(n) {
+    document.querySelectorAll('.day-panel').forEach((p, i) => {
+      p.classList.toggle('active', i === n - 1);
+    });
+    document.querySelectorAll('.day-tab').forEach((t, i) => {
+      t.classList.toggle('active', i === n - 1);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateSlider(input) {
+    const val = input.parentElement.querySelector('.slider-val');
+    if (val) val.textContent = input.value;
+    
+    const pct = (input.value - 1) / 9;
+    const r = Math.round(184 + (122 - 184) * (1 - pct));
+    const g = Math.round(92 + (176 - 92) * (1 - pct));
+    const b = Math.round(56 + (110 - 56) * (1 - pct));
+    const thumb = `rgb(${r},${g},${b})`;
+    val.style.color = thumb;
+  }
+
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+  }
+</script>
+
+</body>
+</html>
